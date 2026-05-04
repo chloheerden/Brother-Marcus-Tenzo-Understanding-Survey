@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Performance Reporting Tool — Team Survey</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #F7F4EF;
+    --ink: #1A1815;
+    --ink-mid: #4A4640;
+    --ink-light: #8A8480;
+    --ink-faint: #C8C4BF;
+    --border: #E2DDD8;
+    --accent: #2B5440;
+    --accent-light: #EAF0EC;
+    --accent-mid: #4A7A62;
+    --gold: #B8934A;
+    --gold-light: #F5EDD8;
+    --white: #FFFFFF;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .page-header {
+    background: var(--ink);
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    color: var(--white);
+    font-size: 17px;
+    letter-spacing: 0.02em;
+  }
+
+  .logo span {
+    color: var(--gold);
+  }
+
+  .header-tag {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .hero {
+    background: var(--ink);
+    padding: 3.5rem 2rem 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(184,147,74,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: -40px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(43,84,64,0.3) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(26px, 5vw, 38px);
+    color: var(--white);
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero p {
+    color: var(--ink-faint);
+    font-size: 14px;
+    max-width: 420px;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+  }
+
+  .hero-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: rgba(255,255,255,0.06);
+    border: 0.5px solid rgba(255,255,255,0.1);
+    border-radius: 40px;
+    padding: 0.5rem 1.25rem;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+
+  .hero-meta span::before {
+    content: '·';
+    margin-right: 0.5rem;
+    opacity: 0.4;
+  }
+  .hero-meta span:first-child::before { display: none; }
+
+  .progress-bar-wrap {
+    background: var(--border);
+    height: 3px;
+    width: 100%;
+  }
+
+  .progress-bar {
+    height: 3px;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  .main {
+    max-width: 660px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 2.5rem 0 1.5rem;
+  }
+
+  .section-head:first-child { margin-top: 0; }
+
+  .section-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+  }
+
+  .section-line {
+    flex: 1;
+    height: 0.5px;
+    background: var(--border);
+  }
+
+  .card {
+    background: var(--white);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: border-color 0.2s;
+  }
+
+  .card:focus-within {
+    border-color: var(--accent-mid);
+  }
+
+  .q-label {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 4px;
+    line-height: 1.5;
+  }
+
+  .q-num {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent-mid);
+    margin-bottom: 6px;
+    letter-spacing: 0.04em;
+  }
+
+  .q-sub {
+    font-size: 13px;
+    color: var(--ink-light);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 7px; }
+
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 13px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    background: var(--cream);
+    transition: border-color 0.15s, background 0.15s;
+    user-select: none;
+  }
+
+  .opt:hover { border-color: var(--accent-mid); background: var(--accent-light); }
+
+  .opt.selected {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  .opt-indicator {
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink-faint);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .opt.selected .opt-indicator {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+
+  .opt-indicator::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: white;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .opt.selected .opt-indicator::after { opacity: 1; }
+
+  .opt-check {
+    width: 17px;
+    height: 17px;
+    border-radius: 4px;
+    border: 1.5px solid var(--ink-faint);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .opt.selected .opt-check {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+
+  .opt-check svg { opacity: 0; transition: opacity 0.15s; }
+  .opt.selected .opt-check svg { opacity: 1; }
+
+  .opt-text {
+    font-size: 14px;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 11px 13px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    resize: vertical;
+    line-height: 1.6;
+    transition: border-color 0.15s;
+    outline: none;
+  }
+
+  textarea:focus { border-color: var(--accent-mid); background: white; }
+  textarea::placeholder { color: var(--ink-faint); }
+
+  .scale-wrap { margin-top: 4px; }
+
+  .scale-btns {
+    display: flex;
+    gap: 7px;
+  }
+
+  .scale-btn {
+    flex: 1;
+    height: 44px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--cream);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-mid);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .scale-btn:hover { border-color: var(--accent-mid); background: var(--accent-light); color: var(--accent); }
+
+  .scale-btn.selected {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: white;
+  }
+
+  .scale-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+  }
+
+  .scale-labels span {
+    font-size: 11px;
+    color: var(--ink-light);
+  }
+
+  .rank-list { display: flex; flex-direction: column; gap: 7px; }
+
+  .rank-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 13px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--cream);
+    cursor: grab;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    user-select: none;
+  }
+
+  .rank-item:active { cursor: grabbing; }
+  .rank-item.dragging { opacity: 0.5; }
+  .rank-item.drag-over { border-color: var(--accent-mid); background: var(--accent-light); }
+
+  .rank-handle {
+    color: var(--ink-faint);
+    font-size: 13px;
+    letter-spacing: -1px;
+    flex-shrink: 0;
+  }
+
+  .rank-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    border: 0.5px solid var(--accent-mid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .rank-text {
+    font-size: 14px;
+    color: var(--ink);
+    flex: 1;
+  }
+
+  .submit-wrap {
+    margin-top: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .submit-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 14px 3rem;
+    border-radius: 40px;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    letter-spacing: 0.01em;
+  }
+
+  .submit-btn:hover { background: #234736; }
+  .submit-btn:active { transform: scale(0.98); }
+
+  .submit-note {
+    font-size: 12px;
+    color: var(--ink-light);
+  }
+
+  .thankyou {
+    display: none;
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+
+  .thankyou.visible { display: block; }
+
+  .thankyou-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    border: 1px solid var(--accent-mid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+  }
+
+  .thankyou h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 0.75rem;
+  }
+
+  .thankyou p {
+    color: var(--ink-light);
+    font-size: 14px;
+    max-width: 340px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .form-body.hidden { display: none; }
+
+  @media (max-width: 500px) {
+    .hero { padding: 2.5rem 1.25rem 3rem; }
+    .main { padding: 1.5rem 1rem 3rem; }
+    .card { padding: 1.25rem; }
+    .scale-btns { gap: 5px; }
+    .scale-btn { height: 40px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="logo">Brother <span>Marcus</span></div>
+  <div class="header-tag">Internal — prototype only</div>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">Finance team</div>
+  <h1>Performance reporting tool — team survey</h1>
+  <p>We're reviewing the tools we use to track sales and labour performance. Your input will shape what we use next.</p>
+  <div class="hero-meta">
+    <span>7 questions</span>
+    <span>5 minutes</span>
+    <span>Anonymous</span>
+  </div>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<div class="main">
+  <div class="form-body" id="formBody">
+
+    <div class="section-head">
+      <div class="section-num">1</div>
+      <div class="section-title">How you use it today</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="card">
+      <div class="q-num">Question 1</div>
+      <div class="q-label">How often do you use Tenzo week-to-week?</div>
+      <div class="q-sub" style="margin-bottom:14px">Select one.</div>
+      <div class="options" id="q1">
+        <div class="opt" data-val="daily" onclick="selectRadio('q1',this)">
+          <div class="opt-indicator"></div><span class="opt-text">Every day</span>
+        </div>
+        <div class="opt" data-val="few" onclick="selectRadio('q1',this)">
+          <div class="opt-indicator"></div><span class="opt-text">A few times a week</span>
+        </div>
+        <div class="opt" data-val="weekly" onclick="selectRadio('q1',this)">
+          <div class="opt-indicator"></div><span class="opt-text">Once a week or so</span>
+        </div>
+        <div class="opt" data-val="rarely" onclick="selectRadio('q1',this)">
+          <div class="opt-indicator"></div><span class="opt-text">Rarely / only when prompted</span>
+        </div>
+        <div class="opt" data-val="never" onclick="selectRadio('q1',this)">
+          <div class="opt-indicator"></div><span class="opt-text">I don't use it</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="q-num">Question 2</div>
+      <div class="q-label">What do you use Tenzo for most?</div>
+      <div class="q-sub">Tick all that apply.</div>
+      <div class="options" id="q2">
+        <div class="opt" onclick="toggleCheck(this)">
+          <div class="opt-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span class="opt-text">Checking daily or weekly sales</span>
+        </div>
+        <div class="opt" onclick="toggleCheck(this)">
+          <div class="opt-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span class="opt-text">Monitoring actual vs. scheduled hours / labour %</span>
+        </div>
+        <div class="opt" onclick="toggleCheck(this)">
+          <div class="opt-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span class="opt-text">Covers and average spend per head (ASPH)</span>
+        </div>
+        <div class="opt" onclick="toggleCheck(this)">
+          <div class="opt-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span class="opt-text">Sales mix (food vs. drinks, categories)</span>
+        </div>
+        <div class="opt" onclick="toggleCheck(this)">
+          <div class="opt-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span class="opt-text">Budget vs. actual tracking</span>
+        </div>
+        <div class="opt" onclick="toggleCheck(this)">
+          <div class="opt-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span class="opt-text">Reporting to my line manager or the wider business</span>
+        </div>
+        <div class="opt" onclick="toggleCheck(this)">
+          <div class="opt-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span class="opt-text">I don't use it for any of these</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="q-num">Question 3</div>
+      <div class="q-label">Tell us a bit more about how you use Tenzo day-to-day</div>
+      <div class="q-sub">What does it help you do? What does a typical check-in look like for you?</div>
+      <textarea placeholder="e.g. I check it every morning to see last night's covers and revenue before the team briefing, then flag anything unusual to my manager…"></textarea>
+    </div>
+
+    <div class="card">
+      <div class="q-num">Question 4</div>
+      <div class="q-label">Would you find it useful to receive automated performance summary emails?</div>
+      <div class="q-sub">Select all that would be helpful for you.</div>
+      <div class="options" id="q4">
+        <div class="opt" onclick="toggleCheck(this)">
+          <div class="opt-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span class="opt-text">Daily email — previous day's sales, covers, and labour %</span>
+        </div>
+        <div class="opt" onclick="toggleCheck(this)">
+          <div class="opt-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span class="opt-text">Weekly email — full week summary vs. budget and prior year</span>
+        </div>
+        <div class="opt" onclick="toggleCheck(this)">
+          <div class="opt-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span class="opt-text">New site performance updates — trading highlights as new sites open and ramp up</span>
+        </div>
+        <div class="opt" onclick="toggleCheck(this)">
+          <div class="opt-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span class="opt-text">Both daily and weekly</span>
+        </div>
+        <div class="opt" onclick="toggleCheck(this)">
+          <div class="opt-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span class="opt-text">Neither — I prefer to check myself</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <div class="section-num">2</div>
+      <div class="section-title">What matters most</div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="card">
+      <div class="q-num">Question 5</div>
+      <div class="q-label">Rank the features that matter most to you</div>
+      <div class="q-sub">Drag to reorder — most important at the top.</div>
+      <div class="rank-list" id="rankList">
+        <div class="rank-item" draggable="true"><span class="rank-handle">⠿⠿</span><div class="rank-num">1</div><span class="rank-text">Real-time sales by site</span></div>
+        <div class="rank-item" draggable="true"><span class="rank-handle">⠿⠿</span><div class="rank-num">2</div><span class="rank-text">Labour % vs. revenue</span></div>
+        <div class="rank-item" draggable="true"><span class="rank-handle">⠿⠿</span><div class="rank-num">3</div><span class="rank-text">Covers and ASPH tracking</span></div>
+        <div class="rank-item" draggable="true"><span class="rank-handle">⠿⠿</span><div class="rank-num">4</div><span class="rank-text">Sales mix / item-level detail</span></div>
+        <div class="rank-item" draggable="true"><span class="rank-handle">⠿⠿</span><div class="rank-num">5</div><span class="rank-text">Budget vs. actual tracking</span></div>
+        <div class="rank-item" draggable="true"><span class="rank-handle">⠿⠿</span><div class="rank-num">6</div><span class="rank-text">Mobile-friendly access</span></div>
+        <div class="rank-item" draggable="true"><span class="rank-handle">⠿⠿</span><div class="rank-num">7</div><span class="rank-text">Alerts when thresholds are breached</span></div>
+        <div class="rank-item" draggable="true"><span class="rank-handle">⠿⠿</span><div class="rank-num">8</div><span class="rank-text">Group roll-up across all sites</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="q-num">Question 6</div>
+      <div class="q-label">How important is being able to check your site on your phone?</div>
+      <div class="q-sub">1 = not important at all &nbsp;·&nbsp; 5 = essential</div>
+      <div class="scale-wrap">
+        <div class="scale-btns" id="scale6">
+          <button class="scale-btn" onclick="selectScale('scale6',this)">1</button>
+          <button class="scale-btn" onclick="selectScale('scale6',this)">2</button>
+          <button class="scale-btn" onclick="selectScale('scale6',this)">3</button>
+          <button class="scale-btn" onclick="selectScale('scale6',this)">4</button>
+          <button class="scale-btn" onclick="selectScale('scale6',this)">5</button>
+        </div>
+        <div class="scale-labels"><span>Not important</span><span>Essential</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="q-num">Question 7</div>
+      <div class="q-label">Anything else you'd like us to know?</div>
+      <div class="q-sub">Open floor — anything we haven't asked that feels important.</div>
+      <textarea placeholder="Your thoughts…"></textarea>
+    </div>
+
+    <div class="submit-wrap">
+      <button class="submit-btn" onclick="submitForm()">Submit responses</button>
+      <div class="submit-note">Your responses are anonymous and won't be attributed to you.</div>
+    </div>
+
+  </div>
+
+  <div class="thankyou" id="thankyou">
+    <div class="thankyou-icon">
+      <svg width="22" height="18" viewBox="0 0 22 18" fill="none">
+        <path d="M1.5 9L7.5 15L20.5 1.5" stroke="#2B5440" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h2>Thanks for your input</h2>
+    <p>Your answers will feed directly into the decision. We'll share a summary of themes back to the team once we've reviewed everything.</p>
+  </div>
+</div>
+
+<script>
+  function selectRadio(groupId, el) {
+    document.querySelectorAll('#' + groupId + ' .opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    updateProgress();
+  }
+
+  function toggleCheck(el) {
+    el.classList.toggle('selected');
+    updateProgress();
+  }
+
+  function selectScale(groupId, btn) {
+    document.querySelectorAll('#' + groupId + ' .scale-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const total = 7;
+    let answered = 0;
+    if (document.querySelector('#q1 .opt.selected')) answered++;
+    if (document.querySelector('#q2 .opt.selected')) answered++;
+    const ta = document.querySelectorAll('textarea');
+    if (ta[0] && ta[0].value.trim()) answered++;
+    if (document.querySelector('#q4 .opt.selected')) answered++;
+    if (document.querySelector('#scale6 .scale-btn.selected')) answered++;
+    answered += 2;
+    const pct = Math.min(100, Math.round((answered / total) * 100));
+    document.getElementById('progressBar').style.width = pct + '%';
+  }
+
+  document.querySelectorAll('textarea').forEach(t => t.addEventListener('input', updateProgress));
+
+  function submitForm() {
+    document.getElementById('formBody').classList.add('hidden');
+    document.getElementById('thankyou').classList.add('visible');
+    document.getElementById('progressBar').style.width = '100%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  const rankList = document.getElementById('rankList');
+  let draggedItem = null;
+
+  rankList.addEventListener('dragstart', e => {
+    draggedItem = e.target.closest('.rank-item');
+    setTimeout(() => draggedItem && draggedItem.classList.add('dragging'), 0);
+  });
+
+  rankList.addEventListener('dragend', () => {
+    if (draggedItem) draggedItem.classList.remove('dragging');
+    document.querySelectorAll('.rank-item').forEach(i => i.classList.remove('drag-over'));
+    draggedItem = null;
+  });
+
+  rankList.addEventListener('dragover', e => {
+    e.preventDefault();
+    const over = e.target.closest('.rank-item');
+    if (!over || over === draggedItem) return;
+    document.querySelectorAll('.rank-item').forEach(i => i.classList.remove('drag-over'));
+    over.classList.add('drag-over');
+    const items = [...rankList.querySelectorAll('.rank-item')];
+    const di = items.indexOf(draggedItem), oi = items.indexOf(over);
+    rankList.insertBefore(draggedItem, di < oi ? over.nextSibling : over);
+    rankList.querySelectorAll('.rank-item').forEach((el, i) => el.querySelector('.rank-num').textContent = i + 1);
+  });
+</script>
+</body>
+</html>
